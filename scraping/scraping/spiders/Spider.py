@@ -9,30 +9,34 @@ class SpiderSpider(scrapy.Spider):
     name = 'Spider'
     allowed_domains = ['www.hurriyetemlak.com']
     start_urls = ['https://www.hurriyetemlak.com/istanbul-satilik/daire?page=1']
-
+    
+    #İlanların buluğu sayfadaki ilan linklerine tek tek bu fonksiyonda giriliyor
     def parse(self, response):
-
-        for href in response.xpath("//div[@class='links']/a[@class='card-link']/@href"):
+        #İlanlara ait linkler xpath ile alınarak liste oluşuyor ve linkler geziliyor.
+        for href in response.xpath("//div[@class='links']/a[@class='card-link']/@href"): 
             url = response.urljoin(href.extract())
             yield scrapy.Request(url, callback=self.parse_page)
-
-        """page_url = response.xpath("//link[@rel='canonical']/@href").extract()
+        
+        #bulunan sayfanın sayfa numarası çekliyor.
+        page_url = response.xpath("//link[@rel='canonical']/@href").extract()
         page_number = int(str(page_url)[60:].split("'")[0])
-
+        
+        #url bir sonraki sayfa için güncelleniyor
         if page_number < 1400:
             url = response.urljoin("https://www.hurriyetemlak.com/istanbul-satilik/daire?page=" + str(page_number + 1))
-            yield scrapy.Request(url, self.parse)"""
+            yield scrapy.Request(url, self.parse)
 
-
+    #İlan detaylarının bulunduğu sayfalan bilgiler alınıyor.
     def parse_page(self, response):
-        item = ScrapingItem()
-
+        item = ScrapingItem() #items.py üzerindeki verilen tutulduğu class
+        
+        #gerekli veriler xpath ile alınıyor
         item['fiyat'] = response.xpath("//div[@class='right']/p[@class='fontRB fz24 price']/text()").extract()
         tablo = response.xpath("//div[@class='det-adv-info']/ul[@class='adv-info-list']/li/span/text()").extract()
         info = response.xpath("//div[@class='det-title-bottom']/ul[@class='short-info-list']/li/span/text()").extract()
         konum = response.xpath("//div[@class='det-title-bottom']/ul[@class='short-info-list']/li/text()").extract()
 
-
+        #item nesnelerine değerler veriliyor.
         item['il'] = konum[0] # ['\nİstanbul\n', '\nFatih\n', '\nŞehremini\n', 'Satılık', ' Daire']
         item['ilce'] = konum[1]
         item['mahalle'] = konum[2]
@@ -82,4 +86,4 @@ class SpiderSpider(scrapy.Spider):
                 elif tablo[i - 1] == "Yapı Tipi":
                     item['yapi_tipi'] = tablo[i]
 
-        return item
+        yield item
