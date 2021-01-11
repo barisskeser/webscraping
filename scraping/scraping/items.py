@@ -6,6 +6,7 @@
 import scrapy
 
 
+#Verileri tutmak için alanlar
 class ScrapingItem(scrapy.Item):
     banyo = scrapy.Field()
     bina_kat = scrapy.Field()
