@@ -13,7 +13,8 @@ class SpiderSpider(scrapy.Spider):
     #İlanların buluğu sayfadaki ilan linklerine tek tek bu fonksiyonda giriliyor
     def parse(self, response):
         #İlanlara ait linkler xpath ile alınarak liste oluşuyor ve linkler geziliyor.
-        for href in response.xpath("//div[@class='links']/a[@class='card-link']/@href"): 
+        for href in response.xpath("//div[@class='links']/a[@class='card-link']/@href"):
+            time.sleep(2)
             url = response.urljoin(href.extract())
             yield scrapy.Request(url, callback=self.parse_page)
         
