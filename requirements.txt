@@ -1,0 +1,2 @@
+Microsoft C++ 14.0 or greater
+pip install Scrapy
